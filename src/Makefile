@@ -26,7 +26,8 @@ PREFIX := ./
 ARCH := hdlmake
 
 ../$(ARCH): $(foreach src, $(SRC), $(PREFIX)$(src))
-	zip $(ARCH) $(SRC)
+	echo "$^"
+	zip $(ARCH) $^
 	echo '#!/usr/bin/python' > ../$(ARCH)
 	cat $(ARCH).zip >> ../$(ARCH)
 	rm $(ARCH).zip
