@@ -63,37 +63,27 @@ class DependencySolver:
 
     def __find_provider_verilog_files(self, v_file):
         import os
-        print("FPF" + v_file.path)
-
         ret = []
 
-        for req in v_file.dep_requires:
-            vf_dirname = v_file.dirname
-            h_file = os.path.join(vf_dirname, req)
-            if os.path.exists(h_file) and not os.path.isdir(h_file):
-                dep_file = self.sff.new(h_file)
-                #go recursively into all included files
-                ret.extend(self.__find_provider_verilog_files(dep_file))
-                ret.append(dep_file)
-                continue
+        inc_dirs = self.__parse_vlog_opt(v_file.vlog_opt)
 
-            inc_dirs = self.__parse_vlog_opt(v_file.vlog_opt)
+        for dir in inc_dirs:
+            dir = os.path.join(vf_dirname, dir)
+            if not os.path.exists(dir) or not os.path.isdir(dir):
+                p.rawprint("WARNING: include path "+dir+" doesn't exist")
 
-            for dir in inc_dirs:
-                dir = os.path.join(vf_dirname, dir)
-                if not os.path.exists(dir) or not os.path.isdir(dir):
-                    p.rawprint("WARNING: include path "+dir+" doesn't exist")
-                    continue
-                h_file = os.path.join(dir, req)
+        for req in v_file.dep_requires: #find all required files
+            for dir in [v_file.dirname]+inc_dirs:
+                h_file = os.path.join(vf_dirname, req)
                 if os.path.exists(h_file) and not os.path.isdir(h_file):
                     dep_file = self.sff.new(h_file)
                     #go recursively into all included files
                     ret.extend(self.__find_provider_verilog_files(dep_file))
                     ret.append(dep_file)
                     continue
+
             #if we reached this point, we didn't find anything
             p.rawprint("Cannot find include for file "+str(f)+": "+req)
-        print("RET"+str(ret))
         return ret
 
     def __parse_vlog_opt(self, vlog_opt):
