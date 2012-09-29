@@ -23,7 +23,7 @@ __main__.py makefile_writer.py module.py msg.py path.py \
 srcfile.py
 PREFIX := ./
 
-ARCH := hdlmake
+ARCH := hdlmake2
 
 ../$(ARCH): $(foreach src, $(SRC), $(PREFIX)$(src))
 	zip $(ARCH) $(SRC)
