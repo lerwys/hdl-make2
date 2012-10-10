@@ -17,6 +17,7 @@
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
 #
+# Modified to support Xilinx simulation tool (ISim) by Lucas Russo <lucas.russo@lnls.br>
 
 from dep_solver import IDependable 
 import os
@@ -152,7 +153,7 @@ class VHDLFile(SourceFile):
                         p.error("Picking standard ISim simulation libraries. Try to fix the error.")
                         std_libs =  flow.ISIM_STARDAND_LIBS
                 elif global_mod.top_module.action == "synthesis":
-                    print("setting std libs for synthesis...")
+                    #print("setting std libs for synthesis...")
                     if global_mod.top_module.target == "xilinx":
                         std_libs = flow.ISE_STANDARD_LIBS
                     elif global_mod.top_module.target == "altera":
