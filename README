@@ -4,3 +4,71 @@ and Tomasz Wlostowski.
 The inteded modification is to allow ISE Simulation (ISim) simulation.
 
 Original project in: http://www.ohwr.org/projects/hdl-make
+
+=======================================================================
+
+Installation Instructions (Ubuntu Linux):
+
+	-> Change to a desired top directory. I will refer to it by
+		<hdlmake2_parent_dir>
+
+1 - cd <hdlmake2_parent_dir>
+
+	-> Clone this repository.
+
+2 - git clone git://github.com/lerwys/hdl-make2.git
+or
+2 - git clone https://github.com/lerwys/hdl-make2.git
+
+	-> Put hdlmake2 tool in the system search path.
+		Option 1: Make a symlink to hdlmake2 tool (recommended)
+		Option 2: Copy hdlmake2 tool into a directory searched by
+			your terminal emulator (bash, cygwin, etc)
+
+3 - (Option 1) sudo ln -s <hdlmake2_parent_dir>/hdl-make2/hdlmake2 \
+				/usr/bin/hdlmake2
+or
+3 - (Option 2) sudo cp <hdlmake2_parent_dir>/hdl-make2/hdlmake2 /usr/bin/
+
+=======================================================================
+
+Use Instructions:
+
+For further instructions on how to use hdlmake2 refer to the documents
+located inside the "doc" folder. You will find information regarding
+what is the Manifests files, how to create them and how to create 
+makefiles for simulation and synthesis.
+
+The folder consists of two files files:
+
+1 - hdlmake-manual.pdf: General instruction on how to create projects
+based on hdlmake2 (or hdlmake, as they are mostly the same except for the
+addtional isim support).
+
+2 - hdlmake_quick_start.pdf: Quick start on how to create manifests file
+and how to call and pass arguments to on hdlmake2 (or hdlmake, as they
+are mostly the same except for the addtional isim support).
+
+The files are best suitable for complementary reading, in spite of what 
+the name generally means... =]
+
+=======================================================================
+
+Modifications:
+
+The main modification this project introducesto the original hdlmake
+was concerning the simulation makefile. Now, there is two simulator tools
+supported by hdlmake2: vsim (Modelsim simulator) and isim (xilinx simulator). 
+They can be specified as follows (remember that the directory where the 
+hdlmake will be called must have a top Manifest file):
+
+  -> Create a makfile targeting isim (Xilinx simulator tool)
+  
+$ hdlmake2 --make-isim
+
+  -> Create a makefile targeting vsim (Modelsim simulator tool)
+  
+$ hdlmake2 --make-vsim
+
+The other hdlmake options are left unmodified and can be specified for
+hdlmake2 in the same manner as the original hdlmake.
