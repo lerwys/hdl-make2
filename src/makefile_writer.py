@@ -365,10 +365,10 @@ XILINX_INI_PATH := """ + XilinxsiminiReader.xilinxsim_ini_dir() + """
 VHPCOMP_FLAGS := -intstyle default -incremental -initfile xilinxsim.ini
 ISIM_FLAGS :=
 VLOGCOMP_FLAGS := -intstyle default -incremental -initfile xilinxsim.ini """ + self.__get_rid_of_incdirs(top_module.vlog_opt) + """
-"""
+""" 
         make_preambule_p2 = """## rules #################################
 sim: xilinxsim.ini $(LIB_IND) $(VERILOG_OBJ) $(VHDL_OBJ)
-$(VERILOG_OBJ): $(VHDL_OBJ)
+$(VERILOG_OBJ): $(LIB_IND) xilinxsim.ini 
 $(VHDL_OBJ): $(LIB_IND) xilinxsim.ini
 
 xilinxsim.ini: $(XILINX_INI_PATH)/xilinxsim.ini
