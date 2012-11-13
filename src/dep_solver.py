@@ -17,6 +17,7 @@
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
 #
+# Modified to allow ISim simulation by Lucas Russo (lucas.russo@lnls.br)
 
 import msg as p
 
@@ -79,7 +80,7 @@ class DependencySolver:
 
             if requires:
                 for req in requires:
-                    if req in f.dep_provides: 
+                    if req in f.dep_provides:
                         return start_index
         return None
 

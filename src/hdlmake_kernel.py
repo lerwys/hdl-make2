@@ -18,7 +18,7 @@
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
 #
-# Modified to allow iSim simulation by Lucas Russo (lucas.russo@lnls.br)
+# Modified to allow ISim simulation by Lucas Russo (lucas.russo@lnls.br)
 
 import os
 import msg as p
@@ -51,7 +51,7 @@ class HdlmakeKernel(object):
             self.fetch(unfetched_only = True)
 
         if tm.action == "simulation":
-			# Defaults to isim simulator tool
+            # Defaults to isim simulator tool
             if global_mod.sim_tool == "isim":
                 self.generate_isim_makefile()
             elif global_mod.sim_tool == "vsim":
@@ -59,29 +59,29 @@ class HdlmakeKernel(object):
             else:
                 raise RuntimeError("Unrecognized or not specified simulation tool: "+ str(global_mod.sim_tool))
                 quit()
-			# Force declaration of sim_tool varible in Manifest
-#			if tm.sim_tool == None:
-#				p.error("sim_tool variable must be defined in the manifest")
-#				quit()
-#			# Make distintion between isim and vsim simulators
-#			if tm.sim_tool == "vsim":
-#            	self.generate_modelsim_makefile()
-#			elif tm.sim_tool == "isim":
-#				self.generate_isim_makefile()
-#			else:
-#				raise RuntimeError("Unrecognized sim tool: "+tm.sim_tool)
+            # Force declaration of sim_tool varible in Manifest
+            #if tm.sim_tool == None:
+            #	p.error("sim_tool variable must be defined in the manifest")
+            #	quit()
+            ## Make distintion between isim and vsim simulators
+            #if tm.sim_tool == "vsim":
+            #       	self.generate_modelsim_makefile()
+            #elif tm.sim_tool == "isim":
+            #	self.generate_isim_makefile()
+            #else:
+            #	raise RuntimeError("Unrecognized sim tool: "+tm.sim_tool)
         elif tm.action == "synthesis":
             if tm.syn_project == None:
                 p.error("syn_project variable must be defined in the manifest")
                 quit()
             if tm.target.lower() == "xilinx":
-				self.generate_ise_project()
-				self.generate_ise_makefile()
-				self.generate_remote_synthesis_makefile()
+                self.generate_ise_project()
+                self.generate_ise_makefile()
+                self.generate_remote_synthesis_makefile()
             elif tm.target.lower() == "altera":
-                 self.generate_quartus_project()
-#                self.generate_quartus_makefile()
-#                self.generate_quartus_remote_synthesis_makefile()
+                self.generate_quartus_project()
+              # self.generate_quartus_makefile()
+              # self.generate_quartus_remote_synthesis_makefile()
             else:
                 raise RuntimeError("Unrecognized target: "+tm.target)
         else:
@@ -106,7 +106,7 @@ class HdlmakeKernel(object):
                 p.rawprint("")
 
     def list_files(self):
-        files_str = [] 
+        files_str = []
         for m in self.modules_pool:
             if not m.isfetched:
                 continue
@@ -181,7 +181,7 @@ class HdlmakeKernel(object):
         files.add(sff.new(tcl))
         files.add(sff.new(top_mod.syn_project))
 
-        self.make_writer.generate_remote_synthesis_makefile(files=files, name=top_mod.syn_name, 
+        self.make_writer.generate_remote_synthesis_makefile(files=files, name=top_mod.syn_name,
         cwd=os.getcwd(), user=self.connection.ssh_user, server=self.connection.ssh_server, ise_path=ise_path)
 
     def generate_ise_project(self):
@@ -249,11 +249,11 @@ class HdlmakeKernel(object):
             p.error("Xilinx binaries are not in the PATH variable\n"
                 "Can't determine ISE version")
             quit()
-            
+
         xst = str(lines[0].strip())
         version_pattern = re.compile(".*?(\d\d\.\d).*") #First check if we have version in path
-        match = re.match(version_pattern, xst) 
-        if match: 
+        match = re.match(version_pattern, xst)
+        if match:
 			ise_version=match.group(1)
         else: #If it is not the case call the "xst -h" to get version
 			xst_output = subprocess.Popen('xst -h', shell=True,
@@ -269,7 +269,7 @@ class HdlmakeKernel(object):
 				p.error("xst output is not in expected format: "+ xst_output +"\n"
 					"Can't determine ISE version")
 				return None
-				
+
         p.vprint("ISE version: " + ise_version)
         return ise_version
 
@@ -314,17 +314,17 @@ class HdlmakeKernel(object):
         non_dependable = fileset.inversed_filter(IDependable)
         fileset = solver.solve(fileset)
         fileset.add(non_dependable)
-        
+
         prj = QuartusProject(top_mod.syn_project)
         prj.add_files(fileset)
-        
-        prj.add_initial_properties( top_mod.syn_device, 
-                                   top_mod.syn_grade, 
-                                   top_mod.syn_package, 
+
+        prj.add_initial_properties( top_mod.syn_device,
+                                   top_mod.syn_grade,
+                                   top_mod.syn_package,
                                    top_mod.syn_top)
         prj.preflow = None
         prj.postflow = None
-    
+
         prj.emit()
 
     def __update_existing_quartus_project(self):

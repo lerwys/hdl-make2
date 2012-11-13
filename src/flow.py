@@ -18,7 +18,8 @@
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
 #
-# Modified to allow iSim simulation by Lucas Russo (lucas.russo@lnls.br)
+# Modified to allow ISim simulation by Lucas Russo (lucas.russo@lnls.br)
+# Modified to allow ISim simulation by Adrian Byszuk (adrian.byszuk@lnls.br)
 
 
 import xml.dom.minidom as xml
@@ -112,7 +113,7 @@ class ISEProject:
               "XC4V" : "Virtex4",
               "XC7K" : "Kintex7",
               "XC7A" : "Artix7" }
-							
+
             self.add_property(ISEProjectProperty("Device", syn_device))
             self.add_property(ISEProjectProperty("Device Family", family_names[syn_device[0:4].upper()]))
             self.add_property(ISEProjectProperty("Speed Grade", syn_grade))
@@ -158,7 +159,7 @@ class ISEProject:
                     p.rawprint("Error while parsing existng file's libraries:")
                     p.rawprint(str(sys.exc_info()))
                     quit()
-                    
+
                 where = self.xml_doc.documentElement
                 self.xml_files = self.__purge_dom_node(name="files", where=where)
                 self.xml_bindings = self.__purge_dom_node(name="bindings", where=where)
@@ -347,7 +348,7 @@ class XilinxsiminiReader(object):
 
         #p.info("Reading 'xilinxsim.ini' located in: '"+ str(self.path))
 
-        # Read loggical libraries name, skipping comments and other 
+        # Read loggical libraries name, skipping comments and other
         #possible sections
         reading_libraries = False
         for line in ini:
@@ -356,7 +357,7 @@ class XilinxsiminiReader(object):
             # Still in comments section
             if line == "": continue
 
-            # Not in comments section. Library section: 
+            # Not in comments section. Library section:
             #<logical_library> = <phisical_path>
             line = line.split('=')
             lib = line[0].strip()
@@ -367,17 +368,17 @@ class XilinxsiminiReader(object):
     def xilinxsim_ini_dir():
         import os
         # Does not really need this
-        try:  
+        try:
             xilinx_path = os.environ["XILINX"]
-        except KeyError: 
+        except KeyError:
             p.error("Please set the environment variable XILINX")
             # Fail completely for now
             quit()
 
         # Does not really need this
-        try:  
+        try:
             host_platform = os.environ["HOST_PLATFORM"]
-        except KeyError: 
+        except KeyError:
             p.error("Please set the environment variable HOST_PLATFORM")
             # Fail completely for now
             quit()
