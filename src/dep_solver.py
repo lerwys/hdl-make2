@@ -104,7 +104,7 @@ class DependencySolver:
         inc_dirs = self.__parse_vlog_opt(v_file.vlog_opt)
 
         for dir in inc_dirs:
-            dir = os.path.join(vf_dirname, dir)
+            dir = os.path.join( os.getcwd(), dir)
             if not os.path.exists(dir) or not os.path.isdir(dir):
                 p.warning("Include path "+dir+" doesn't exist")
                 continue
@@ -225,6 +225,8 @@ class DependencySolver:
             #get rid of duplicates by making a set from the list and vice versa
             f.dep_depends_on = list(set(f.dep_depends_on))
 
+
+
         newobj = sf.SourceFileSet();
         newobj.add(f_nondep);
         for f in fset:
@@ -233,6 +235,26 @@ class DependencySolver:
                     newobj.add(f)
             except:
                 newobj.add(f)
+
+    #search for SV includes (BFS algorithm)
+        from srcfile import SVFile
+        for f in [file for file in newobj if isinstance(file, SVFile)]:
+            stack = f.dep_depends_on[:]
+            while stack:
+                qf = stack.pop(0)
+                if qf.dep_requires:
+                    f.dep_requires.extend(qf.dep_requires)
+                    for req in qf.dep_requires:
+                        pf = self.__find_provider_verilog_file(req, f)
+                        if not pf:
+                            p.warning("Cannot find include for file "+str(f)+": "+req)
+                        else:
+                            p.vprint("--> " + pf.path)
+                            f.dep_depends_on.append(pf)
+                            stack.append(pf)
+             #get rid of duplicates by making a set from the list and vice versa
+            f.dep_depends_on = list(set(f.dep_depends_on))
+      
 
         for k in newobj:
             p.vprint(str(k.dep_index) + " " + k.path + str(k._dep_fixed))
