@@ -458,7 +458,7 @@ isim.wdb
             #incdir = "-i "
             #incdir += " -i ".join(vl.include_dirs)
             #incdir += " "
-            self.write(" -i ".join(vl.include_dirs) + " ")
+            self.write("-i " + " -i ".join(vl.include_dirs) + " ")
             self.writeln(vl.vlog_opt+" $<")
             self.write("\t\t@mkdir -p $(dir $@)")
             self.writeln(" && touch $@ \n\n")
