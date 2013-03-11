@@ -297,6 +297,9 @@ class SignalTapFile(File):
         def __init__(self, path):
                 File.__init__(self, path)
 
+class SDCFile(File):
+        def __init__(self, path):
+                File.__init__(self, path)
 
 class DPFFile(File):
         def __init__(self, path):
@@ -373,7 +376,6 @@ class SourceFileFactory:
                         nf = VHDLFile(path, library, vcom_opt)
                 elif extension == 'v' or extension == 'vh' or extension == 'vo':
                         nf = VerilogFile(path, library, vlog_opt, include_dirs)
-                # Fixed missing svh extension
                 elif extension == 'sv' or extension == 'svh':
                         nf = SVFile(path, library, vlog_opt, include_dirs)
                 elif extension == 'ngc':
@@ -390,6 +392,8 @@ class SourceFileFactory:
                         nf = XISEFile(path)
                 elif extension == 'stp':
                         nf = SignalTapFile(path)
+                elif extension == 'sdc':
+                        nf = SDCFile(path)
                 elif extension == 'dpf':
                         nf = DPFFile(path)
                 return nf

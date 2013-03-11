@@ -3,3 +3,9 @@
 *.swap
 *.odt
 *.orig
+misc
+examples
+hdlmake.aux
+hdlmake.pdf
+hdlmake.log
+
