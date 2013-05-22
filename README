@@ -72,3 +72,63 @@ $ hdlmake2 --make-vsim
 
 The other hdlmake options are left unmodified and can be specified for
 hdlmake2 in the same manner as the original hdlmake.
+
+=======================================================================
+
+Simulation instructions:
+
+Go to a testbench directory. It must have a top manifest file:
+  cd /hdl/testbench/path_to_testbench
+
+Run the following commands. You must have hdlmake2 command available
+  in your PATH environment variable.
+
+Create the (ISim) simualation makefile
+
+  $ hdlmake2 --make-isim
+
+Compile the project
+
+  $ make
+
+Create the simulation executable ELF file
+
+  $ make fuse TOP_MODULE=<top_level_testbench_module_without_the_extension>
+
+Execute the simulation with GUI and aditional commands
+
+  $ ./isim_proj -view wave.wcfg -tclbatch isim_cmd -gui
+
+Please note that you MUST have the wave.cfg and isim_cmd files in your 
+directory. Otherwise, compilation will fail!
+
+If you don't care about them or don't have them, you can just
+omit them. In this case, do the following for a GUI waveform:
+
+  $ ./isim_proj -gui
+
+Or the following for raw output (no GUI):
+
+  $ ./isim_proj
+
+=======================================================================
+
+Synthesis instructions:
+
+Go to a syn directory. It must have a top manifest file:
+  cd /hdl/top/path_to_top_design
+
+Run the following commands. You must have hdlmake2 command available
+  in your PATH environment variable.
+
+  Create the synthesis makefile and an ISE project
+
+  $ hdlmake2 --make-ise --ise-proj
+
+Compile the source files locally
+
+  $ make local
+
+Load the generated .bit file with iMPACT or other tool
+
+  $ impact
