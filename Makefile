@@ -18,19 +18,22 @@
 #    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
 #
 SRC := configparser.py connection.py dep_solver.py fetch.py\
-flow.py flow_altera.py global_mod.py hdlmake_kernel.py help_printer.py helper_classes.py\
-__main__.py makefile_writer.py module.py msg.py path.py \
-srcfile.py
-PREFIX := ./
+flow.py flow_altera.py global_mod.py hdlmake_kernel.py\
+help_printer.py helper_classes.py __main__.py makefile_writer.py\
+module.py msg.py path.py srcfile.py\
+
+PREFIX := src
 
 ARCH := hdlmake2
 
-../$(ARCH): $(foreach src, $(SRC), $(PREFIX)$(src))
-	zip $(ARCH) $(SRC)
-	echo '#!/usr/bin/python' > ../$(ARCH)
-	cat $(ARCH).zip >> ../$(ARCH)
-	rm $(ARCH).zip
-	chmod +x ../$(ARCH)
+$(ARCH): $(foreach src, $(SRC), $(PREFIX)/$(src)) Makefile
+	cd $(PREFIX) &&\
+	zip $(ARCH) $(SRC) &&\
+	echo '#!/usr/bin/python' > $(ARCH) &&\
+	cat $(ARCH).zip >> $(ARCH) &&\
+	rm $(ARCH).zip &&\
+	mv $(ARCH) ..
+	chmod +x $(ARCH)
 
 clean:
-	rm -f $(PREFIX)*~ $(PREFIX)*pyc
+	rm -f $(PREFIX)/*~ $(PREFIX)/*pyc
