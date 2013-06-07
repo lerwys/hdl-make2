@@ -18,7 +18,7 @@
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
 #
-# Modified to allow ISim simulation by Lucas Russo (lucas.russo@lnls.br)
+
 
 import os
 import msg as p
@@ -72,7 +72,7 @@ class HdlmakeKernel(object):
             #	raise RuntimeError("Unrecognized sim tool: "+tm.sim_tool)
         elif tm.action == "synthesis":
             if tm.syn_project == None:
-                p.error("syn_project variable must be defined in the manifest")
+                p.error("syn_project variable must be defined in the manfiest")
                 quit()
             if tm.target.lower() == "xilinx":
                 self.generate_ise_project()
@@ -80,14 +80,12 @@ class HdlmakeKernel(object):
                 self.generate_remote_synthesis_makefile()
             elif tm.target.lower() == "altera":
                 self.generate_quartus_project()
-              # self.generate_quartus_makefile()
-              # self.generate_quartus_remote_synthesis_makefile()
+#                self.generate_quartus_makefile()
+#                self.generate_quartus_remote_synthesis_makefile()
             else:
                 raise RuntimeError("Unrecognized target: "+tm.target)
         else:
-            p.printhr()
-            hp.print_action_help()
-            quit()
+            p.print_action_help() and quit()
 
     def list_modules(self):
         for m in self.modules_pool:
@@ -191,9 +189,8 @@ class HdlmakeKernel(object):
                 "Cannot generate ise project")
             quit()
         if not self.modules_pool.is_everything_fetched():
-            p.error("A module remains unfetched. "
-                "Fetching must be done prior to makefile generation")
-            p.rawprint(str([str(m) for m in self.modules_pool.modules if not m.isfetched]))
+            p.echo("A module remains unfetched. Fetching must be done prior to makefile generation")
+            p.echo(str([str(m) for m in self.modules_pool if not m.isfetched]))
             quit()
         ise = self.__check_ise_version()
         if os.path.exists(self.top_module.syn_project):
@@ -254,21 +251,21 @@ class HdlmakeKernel(object):
         version_pattern = re.compile(".*?(\d\d\.\d).*") #First check if we have version in path
         match = re.match(version_pattern, xst)
         if match:
-			ise_version=match.group(1)
+            ise_version=match.group(1)
         else: #If it is not the case call the "xst -h" to get version
-			xst_output = subprocess.Popen('xst -h', shell=True,
-			stdin=subprocess.PIPE, stdout=subprocess.PIPE, close_fds=True)
-			xst_output = xst_output.stdout.readlines()[0]
-			xst_output = xst_output.strip()
-			version_pattern = \
-				re.compile('Release\s(?P<major>\d|\d\d)[^\d](?P<minor>\d|\d\d)\s.*')
-			match = re.match(version_pattern, xst_output)
-			if match:
-				ise_version=''.join((match.group('major'), '.', match.group('minor')))
-			else:
-				p.error("xst output is not in expected format: "+ xst_output +"\n"
-					"Can't determine ISE version")
-				return None
+            xst_output = subprocess.Popen('xst -h', shell=True,
+            stdin=subprocess.PIPE, stdout=subprocess.PIPE, close_fds=True)
+            xst_output = xst_output.stdout.readlines()[0]
+            xst_output = xst_output.strip()
+            version_pattern = \
+                    re.compile('Release\s(?P<major>\d|\d\d)[^\d](?P<minor>\d|\d\d)\s.*')
+            match = re.match(version_pattern, xst_output)
+            if match:
+                ise_version=''.join((match.group('major'), '.', match.group('minor')))
+            else:
+                p.error("xst output is not in expected format: "+ xst_output +"\n"
+                        "Can't determine ISE version")
+                return None
 
         p.vprint("ISE version: " + ise_version)
         return ise_version
@@ -279,13 +276,13 @@ class HdlmakeKernel(object):
         solver = DependencySolver()
         non_dependable = fileset.inversed_filter(IDependable)
         dependable = solver.solve(fileset)
-        all = SourceFileSet()
-        all.add(non_dependable)
-        all.add(dependable)
+        all_files = SourceFileSet()
+        all_files.add(non_dependable)
+        all_files.add(dependable)
 
         prj = ISEProject(ise=ise, top_mod=self.modules_pool.get_top_module())
-        prj.add_files(all)
-        prj.add_libs(all.get_libs())
+        prj.add_files(all_files)
+        prj.add_libs(all_files.get_libs())
         prj.load_xml(top_mod.syn_project)
         prj.emit_xml(top_mod.syn_project)
 
@@ -363,10 +360,10 @@ class HdlmakeKernel(object):
             p.warning("There are no modules fetched. Are you sure it's correct?")
 
         files = self.modules_pool.build_very_global_file_list()
-        tcl = self.__search_tcl_file()
-        if tcl == None:
-            self.__generate_tcl()
-            tcl = "run.tcl"
+#        tcl = self.__search_tcl_file()
+#        if tcl == None:
+        self.__generate_tcl()
+        tcl = "run.tcl"
 
         sff = SourceFileFactory()
         files.add(sff.new(tcl))
@@ -390,12 +387,12 @@ class HdlmakeKernel(object):
     def __search_tcl_file(self, directory = None):
         if directory == None:
             directory = "."
-        dir = os.listdir(directory)
+        filenames = os.listdir(directory)
         tcls = []
-        for file in dir:
-            file_parts = file.split('.')
+        for filename in filenames:
+            file_parts = filename.split('.')
             if file_parts[len(file_parts)-1] == "tcl":
-                tcls.append(file)
+                tcls.append(filename)
         if len(tcls) == 0:
             return None
         if len(tcls) > 1:
@@ -433,3 +430,67 @@ class HdlmakeKernel(object):
                 "Fetching must be done prior to makefile generation")
             quit()
         self.make_writer.generate_fetch_makefile(pool)
+
+    def merge_cores(self):
+        from srcfile import VerilogFile, VHDLFile, SVFile, NGCFile
+        from vlog_parser import VerilogPreprocessor
+
+        solver = DependencySolver()
+
+        pool = self.modules_pool
+        if not pool.is_everything_fetched():
+            p.echo("A module remains unfetched. Fetching must be done prior to makefile generation")
+            p.echo(str([str(m) for m in self.modules_pool.modules if not m.isfetched]))
+            quit()
+
+        flist = pool.build_global_file_list();
+        flist_sorted = solver.solve(flist);
+        
+#        if not os.path.exists(self.options.merge_cores):
+ #           os.makedirs(self.options.merge_cores)
+        base = self.options.merge_cores
+
+        f_out = open(base+".vhd", "w")
+        f_out.write("\n\n\n\n");
+        f_out.write("------------------------------ WARNING -------------------------------\n");
+        f_out.write("-- This code has been generated by hdlmake --merge-cores option     --\n");
+        f_out.write("-- It is provided for your convenience, to spare you from adding    --\n");
+        f_out.write("-- lots of individual source files to ISE/Modelsim/Quartus projects --\n");
+        f_out.write("-- mainly for Windows users. Please DO NOT MODIFY this file. If you --\n");
+        f_out.write("-- need to change something inside, edit the original source file   --\n");
+        f_out.write("-- and re-genrate the merged version!                               --\n");
+        f_out.write("----------------------------------------------------------------------\n");
+        f_out.write("\n\n\n\n");
+        
+        
+        
+        for vhdl in flist_sorted.filter(VHDLFile):
+            f_out.write("\n\n--- File: %s ----\n\n" % vhdl.rel_path())
+            f_out.write(open(vhdl.rel_path(),"r").read()+"\n\n")
+                #print("VHDL: %s" % vhdl.rel_path())
+        f_out.close()
+
+        f_out = open(base+".v", "w")
+
+        f_out.write("\n\n\n\n");
+        f_out.write("////////////////////////////// WARNING ///////////////////////////////\n");
+        f_out.write("// This code has been generated by hdlmake --merge-cores option     //\n");
+        f_out.write("// It is provided for your convenience, to spare you from adding    //\n");
+        f_out.write("// lots of individual source files to ISE/Modelsim/Quartus projects //\n");
+        f_out.write("// mainly for Windows users. Please DO NOT MODIFY this file. If you //\n");
+        f_out.write("// need to change something inside, edit the original source file   //\n");
+        f_out.write("// and re-genrate the merged version!                               //\n");
+        f_out.write("//////////////////////////////////////////////////////////////////////\n");
+        f_out.write("\n\n\n\n");
+
+        for vlog in flist_sorted.filter(VerilogFile):
+            f_out.write("\n\n//    File: %s     \n\n" % vlog.rel_path())
+            vpp = VerilogPreprocessor()
+            vpp.add_path(vlog.dirname)
+            f_out.write(vpp.preprocess(vlog.rel_path()))
+        f_out.close()
+
+        for ngc in flist_sorted.filter(NGCFile):
+            import shutil
+            print("NGC:%s " % ngc.rel_path())
+            shutil.copy(ngc.rel_path(), self.options.merge_cores+"/")

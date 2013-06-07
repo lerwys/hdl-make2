@@ -18,7 +18,6 @@
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
 #
-# Modified to allow ISim simulation by Lucas Russo (lucas.russo@lnls.br)
 
 import os
 import string
@@ -59,7 +58,7 @@ class MakefileWriter(object):
         self._file = open(filename, "w")
 
     def generate_remote_synthesis_makefile(self, files, name, cwd, user, server, ise_path):
-        import path
+        import path 
         if name == None:
             import random
             name = ''.join(random.choice(string.ascii_letters + string.digits) for x in range(8))
@@ -81,12 +80,12 @@ endif
         else:
             user_tmpl = user_tmpl.format(user)
             test_tmpl = "__test_for_remote_synthesis_variables:\n\t\ttrue #dummy\n"
-
+            
         if server == None:
             server_tmpl = server_tmpl.format("$(HDLMAKE_SERVER)#take the value from the environment")
         else:
             server_tmpl = server_tmpl.format(server)
-
+            
         remote_name_tmpl = remote_name_tmpl.format(name)
         self.initialize()
         self.writeln(user_tmpl)
@@ -117,7 +116,7 @@ endif
         self.writeln(synthesis_cmd.format(ise_path, tcl))
 
         self.writeln()
-
+ 
         send_back_cmd = "__send_back: \n\t\tcd .. && rsync -av $(USER)@$(SERVER):$(R_NAME)$(CWD) . && cd $(CWD)"
         self.write(send_back_cmd)
         self.write("\n\n")
@@ -131,7 +130,7 @@ endif
         pass
 
     def generate_ise_makefile(self, top_mod, ise_path):
-        import path
+        import path 
         mk_text = """PROJECT := {1}
 ISE_CRAP := \
 *.b \
@@ -191,7 +190,7 @@ local:
 clean:
 \t\trm -f $(ISE_CRAP)
 \t\trm -rf xst xlnx_auto_*_xdb iseconfig _xmsgs _ngo
-
+    
 #target for cleaning final files
 mrproper:
 \t\trm -f *.bit *.bin *.mcs
@@ -243,7 +242,7 @@ mrproper:
                     self.write("git checkout " + module.revision + ';')
                 self.write("cd $(PWD) \n\n")
 
-    def generate_vsim_makefile(self, fileset, top_module):
+    def generate_modelsim_makefile(self, fileset, top_module):
         from srcfile import VerilogFile, VHDLFile, SVFile
         from flow import ModelsiminiReader
         make_preambule_p1 = """## variables #############################
@@ -254,10 +253,10 @@ MODELSIM_INI_PATH := """ + ModelsiminiReader.modelsim_ini_dir() + """
 VCOM_FLAGS := -quiet -modelsimini modelsim.ini
 VSIM_FLAGS :=
 VLOG_FLAGS := -quiet -modelsimini modelsim.ini """ + self.__get_rid_of_incdirs(top_module.vlog_opt) + """
-"""
+""" 
         make_preambule_p2 = """## rules #################################
 sim: modelsim.ini $(LIB_IND) $(VERILOG_OBJ) $(VHDL_OBJ)
-$(VERILOG_OBJ): $(VHDL_OBJ)
+$(VERILOG_OBJ): $(VHDL_OBJ) 
 $(VHDL_OBJ): $(LIB_IND) modelsim.ini
 
 modelsim.ini: $(MODELSIM_INI_PATH)/modelsim.ini
@@ -311,7 +310,7 @@ clean:
 
         for lib in libs:
             self.write(lib+"/."+lib+":\n")
-            self.write(' '.join(["\t(vlib",  lib, "&&", "vmap", "-modelsimini modelsim.ini",
+            self.write(' '.join(["\t(vlib",  lib, "&&", "vmap", "-modelsimini modelsim.ini", 
             lib, "&&", "touch", lib+"/."+lib,")"]))
 
             self.write(' '.join(["||", "rm -rf", lib, "\n"]))
@@ -338,20 +337,13 @@ clean:
         #list rules for all _primary.dat files for vhdl
         for vhdl in fileset.filter(VHDLFile):
             lib = vhdl.library
-            purename = vhdl.purename
+            purename = vhdl.purename 
             #each .dat depends on corresponding .vhd file
             self.write(os.path.join(lib, purename, "."+purename+"_"+ vhdl.extension()) + ": "+vhdl.rel_path()+'\n')
             self.writeln(' '.join(["\t\tvcom $(VCOM_FLAGS)", vhdl.vcom_opt, "-work", lib, "$< "]))
             self.writeln("\t\t@mkdir -p $(dir $@) && touch $@\n")
             self.writeln()
-            if len(vhdl.dep_depends_on) != 0:
-                self.write(os.path.join(lib, purename, "."+purename) +":")
-                for dep_file in vhdl.dep_depends_on:
-                    name = dep_file.purename
-                    self.write(" \\\n"+ os.path.join(dep_file.library, name, "."+name))
-                self.write('\n\n')
 
-# Modification here
     def generate_isim_makefile(self, fileset, top_module):
         from srcfile import VerilogFile, VHDLFile, SVFile
         from flow import XilinxsiminiReader

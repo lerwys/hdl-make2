@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2011 Pawel Szostek (pawel.szostek@cern.ch)
@@ -18,23 +19,10 @@
 #    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
 #
 
-import msg as p
-
-class HelpPrinter():
-    @staticmethod
-    def print_action_help():
-        p.rawprint("`Action' variable was not specified")
-        p.rawprint("Allowed values are: \"simulation\" or \"synthesis\"")
-        p.rawprint()
-        p.rawprint("This variable in a manifest file is necessary for Hdlmake " \
-        "to be able to know what to do with the given modules' structure.")
-        HelpPrinter.__more()
-
-    @staticmethod
-    def __more():
-        p.rawprint("For more help type `hdlmake --help' " \
-        "or visit http://www.ohwr.org/projects/hdl-make")
-
-if __name__ == "__main__":
-    hp = HelpPrinter
-    hp.print_action_help()
+options = None
+top_module = None
+global_target = "''"
+#######
+#this var is modified by the build makefile - DON'T TOUCH IT!
+BUILD_ID = "2013Feb22:341efe"
+######

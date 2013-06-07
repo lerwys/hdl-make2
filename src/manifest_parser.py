@@ -90,7 +90,7 @@ class ManifestParser(ConfigParser):
         return ConfigParser.parse(self)
 
     def print_help(self):
-        self.ConfigParser.print_help()
+        ConfigParser.help()
 
     def search_for_package(self):
         """
@@ -98,7 +98,7 @@ class ManifestParser(ConfigParser):
         from the file
         """
         import re
-        f = open(self.path, "r")
+        f = open(self.config_file, "r")
         try:
             text = f.readlines()
         except UnicodeDecodeError:

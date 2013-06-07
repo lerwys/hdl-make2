@@ -18,7 +18,6 @@
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
 #
-# Modified to allow ISim simulation by Lucas Russo (lucas.russo@lnls.br)
 
 
 import os
@@ -30,7 +29,10 @@ from module import Module
 from fetch import ModulePool
 
 def main():
-    parser = optparse.OptionParser()
+    usage = "usage: %prog [options]\n"
+    usage += "type %prog --help to get help message"
+    
+    parser = optparse.OptionParser(usage=usage)
 
     parser.add_option("--manifest-help", action="store_true",
     dest="manifest_help", help="print manifest file variables description")
@@ -58,12 +60,19 @@ def main():
 
     parser.add_option("--list", action="store_true", dest="list",
     default=None, help="List all modules together with their files")
-
+    
     parser.add_option("--list-files", action="store_true", dest="list_files",
     default=None, help="List all files in a from of a space-separated string")
 
+    parser.add_option("--merge-cores=name", default=None, dest="merge_cores",
+		help="Merges entire synthesizable content of an project into a pair of VHDL/Verilog files")
+
     parser.add_option("--ise-proj", action="store_true", dest="ise_proj",
     default=None, help="create/update an ise project including list of project"
+        "files")
+
+    parser.add_option("--quartus-proj", action="store_true", dest="quartus_proj",
+    default=None, help="create/update a quartus project including list of project"
         "files")
 
     parser.add_option("-l", "--synthesize-locally", dest="local",
@@ -90,13 +99,16 @@ def main():
     default="false", help="verbose mode")
 
     (options, _) = parser.parse_args()
-
-	# Setting global variable (global_mod.py)
     global_mod.options = options
 
+    #HANDLE PROJECT INDEPENDENT OPTIONS
     if options.manifest_help == True:
-        from helper_classes import ManifestParser
+        from manifest_parser import ManifestParser
         ManifestParser().help()
+        quit()
+
+    if options.print_version == True:
+        p.print_version()
         quit()
 
   # Check later if a simulation tool should have been specified
@@ -107,27 +119,14 @@ def main():
     p.info("Simulation tool: " + str(global_mod.sim_tool))
 
     p.vprint("LoadTopManifest")
-
-	# Initialize empty module list
     pool = ModulePool()
+    pool.new_module(parent=None, url=os.getcwd(), source="local", fetchto=".")
 
-	# Initialize top module and setting looking fot its manifest in URL (local | remote) path
-    top_module = Module(parent=None, url=os.getcwd(), source="local",
-        fetchto=".", pool=pool)
-
-	# Setting top_module as top module of design (ModulePool class)
-    pool.set_top_module(top_module)
-
-    if top_module.manifest == None:
-        p.echo("No manifest found. At least an empty one is needed")
+    if pool.get_top_module().manifest == None:
+        p.rawprint("No manifest found. At least an empty one is needed")
+        p.rawprint("To see some help, type hdlmake --help")
         quit()
-
-	# Setting global variable (global_mod.py)
-    global_mod.top_module = top_module
-
-	# Parse manifest of top_module
-    global_mod.top_module.parse_manifest()
-
+    global_mod.top_module = pool.get_top_module()
     global_mod.global_target = global_mod.top_module.target
 
     ssh = Connection(ssh_user=options.synth_user,
@@ -138,19 +137,20 @@ def main():
 
     options_kernel_mapping = {
         "fetch" : "fetch",
-#        "make_sim" : "generate_modelsim_makefile",
-        "make_vsim" : "generate_vsim_makefile",
-        "make_isim" : "generate_isim_makefile",
+        "make_sim" : "generate_modelsim_makefile",
         "ise_proj" : "generate_ise_project",
+        "quartus_proj" : "generate_quartus_project",
         "local" : "run_local_synthesis",
         "remote": "run_remote_synthesis",
         "make_fetch": "generate_fetch_makefile",
         "make_ise" : "generate_ise_makefile",
         "make_remote" : "generate_remote_synthesis_makefile",
         "list" : "list_modules",
-        "clean" : "clean_modules"
+        "clean" : "clean_modules",
+        "merge_cores" : "merge_cores"
     }
     sth_chosen = False
+    import traceback
     for option, function in options_kernel_mapping.items():
         try:
             is_set = getattr(options, option)
@@ -158,9 +158,14 @@ def main():
                 sth_chosen = True
                 getattr(kernel, function)()
         except Exception, unknown_error :
-            print unknown_error
+            p.echo("Oooops! We've got an error. Here is the appropriate info:\n")
+            p.print_version()
+            print(unknown_error) 
+            traceback.print_exc()
 
     if not sth_chosen:
+        p.rawprint("No option selected. Running automatic flow")
+        p.rawprint("To see some help, type hdlmake --help")
         kernel.run()
 
 if __name__ == "__main__":

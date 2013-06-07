@@ -4,8 +4,10 @@
 *.odt
 *.orig
 misc
+src/build_hash.py
 examples
 hdlmake.aux
 hdlmake.pdf
 hdlmake.log
+hdlmake
 
