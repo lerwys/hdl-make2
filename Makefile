@@ -24,7 +24,7 @@ SRC_DIR := src
 SRC := $(foreach src, $(SRC_FILES), $(SRC_DIR)/$(src))
 TAG = $(shell git describe --abbrev=0 --tags --always)#get the latest tag
 RELEASE = hdlmake-$(TAG).tar.gz
-EXEC := hdlmake
+EXEC := hdlmake2
 
 executable: $(EXEC)
 $(EXEC): $(SRC)
@@ -44,5 +44,5 @@ $(RELEASE): $(EXEC) $(SRC)
 .PHONY: clean
 
 clean:
-	rm -f $(SRC_DIR)/*~ $(PREFIX)/*pyc $(EXEC) hdlmake-*.tar.gz 
+	rm -f $(SRC_DIR)/*~ $(PREFIX)/*pyc $(EXEC) hdlmake-*.tar.gz
 
