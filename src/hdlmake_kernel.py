@@ -24,7 +24,6 @@ import os
 import msg as p
 import path
 import global_mod
-from help_printer import HelpPrinter as hp
 from makefile_writer import MakefileWriter
 from flow import ISEProject, ISEProjectProperty
 from flow_altera import QuartusProject
@@ -445,7 +444,7 @@ class HdlmakeKernel(object):
 
         flist = pool.build_global_file_list();
         flist_sorted = solver.solve(flist);
-        
+
 #        if not os.path.exists(self.options.merge_cores):
  #           os.makedirs(self.options.merge_cores)
         base = self.options.merge_cores
@@ -461,9 +460,9 @@ class HdlmakeKernel(object):
         f_out.write("-- and re-genrate the merged version!                               --\n");
         f_out.write("----------------------------------------------------------------------\n");
         f_out.write("\n\n\n\n");
-        
-        
-        
+
+
+
         for vhdl in flist_sorted.filter(VHDLFile):
             f_out.write("\n\n--- File: %s ----\n\n" % vhdl.rel_path())
             f_out.write(open(vhdl.rel_path(),"r").read()+"\n\n")
