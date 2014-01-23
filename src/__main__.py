@@ -140,7 +140,8 @@ def main():
 
     options_kernel_mapping = {
         "fetch" : "fetch",
-        "make_sim" : "generate_vsim_makefile",
+        "make_vsim" : "generate_vsim_makefile",
+        "make_isim" : "generate_isim_makefile",
         "ise_proj" : "generate_ise_project",
         "quartus_proj" : "generate_quartus_project",
         "local" : "run_local_synthesis",
