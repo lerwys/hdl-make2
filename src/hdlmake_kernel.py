@@ -64,7 +64,7 @@ class HdlmakeKernel(object):
             #	quit()
             ## Make distintion between isim and vsim simulators
             #if tm.sim_tool == "vsim":
-            #       	self.generate_modelsim_makefile()
+            #       	self.generate_vsim_makefile()
             #elif tm.sim_tool == "isim":
             #	self.generate_isim_makefile()
             #else:
@@ -129,7 +129,7 @@ class HdlmakeKernel(object):
         top_module = pool.get_top_module()
         flist = pool.build_global_file_list();
         flist_sorted = solver.solve(flist);
-        #self.make_writer.generate_modelsim_makefile(flist_sorted, top_module)
+        #self.make_writer.generate_vsim_makefile(flist_sorted, top_module)
         self.make_writer.generate_vsim_makefile(flist_sorted, top_module)
 
     def generate_isim_makefile(self):

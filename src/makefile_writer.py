@@ -242,7 +242,7 @@ mrproper:
                     self.write("git checkout " + module.revision + ';')
                 self.write("cd $(PWD) \n\n")
 
-    def generate_modelsim_makefile(self, fileset, top_module):
+    def generate_vsim_makefile(self, fileset, top_module):
         from srcfile import VerilogFile, VHDLFile, SVFile
         from flow import ModelsiminiReader
         make_preambule_p1 = """## variables #############################
