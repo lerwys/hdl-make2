@@ -31,7 +31,7 @@ from fetch import ModulePool
 def main():
     usage = "usage: %prog [options]\n"
     usage += "type %prog --help to get help message"
-    
+
     parser = optparse.OptionParser(usage=usage)
 
     parser.add_option("--manifest-help", action="store_true",
@@ -60,7 +60,7 @@ def main():
 
     parser.add_option("--list", action="store_true", dest="list",
     default=None, help="List all modules together with their files")
-    
+
     parser.add_option("--list-files", action="store_true", dest="list_files",
     default=None, help="List all files in a from of a space-separated string")
 
@@ -97,6 +97,9 @@ def main():
 
     parser.add_option("-v", "--verbose", dest="verbose", action="store_true",
     default="false", help="verbose mode")
+
+    parser.add_option("--version", dest="print_version", action="store_true",
+    default="false", help="print version id of this Hdlmake build")
 
     (options, _) = parser.parse_args()
     global_mod.options = options
@@ -160,7 +163,7 @@ def main():
         except Exception, unknown_error :
             p.echo("Oooops! We've got an error. Here is the appropriate info:\n")
             p.print_version()
-            print(unknown_error) 
+            print(unknown_error)
             traceback.print_exc()
 
     if not sth_chosen:
